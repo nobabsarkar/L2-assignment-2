@@ -1,24 +1,16 @@
 import { pool } from "../../db";
-import type { IUser } from "../../types";
 import type { IIssue } from "./issue.interface";
 
-const createIssueIntoDB = async (payload: IIssue) => {
+const createIssueIntoDB = async (payload: IIssue, reporter_id: number) => {
   const { title, description, type } = payload;
-
-  //   const user = await pool.query(
-  //     `
-  //         SELECT * FROM users WHERE id=$1
-  //         `,
-  //     [reporter_id],
-  //   );
 
   const result = await pool.query(
     `
-            INSERT INTO issues(title, description, type)
-             VALUES($1, $2, $3)
+            INSERT INTO issues(title, description, type, reporter_id)
+             VALUES($1, $2, $3, $4)
              RETURNING *
             `,
-    [title, description, type],
+    [title, description, type, reporter_id],
   );
 
   return result;

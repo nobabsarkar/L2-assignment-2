@@ -1,6 +1,6 @@
-export type IUser = {
-  name: string;
-  email: string;
-  password: string;
-  role: string;
+export const ROLE = {
+  contributor: "contributor",
+  maintainer: "maintainer",
 };
+
+export type Roles = "contributor" | "maintainer";
