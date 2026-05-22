@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { issueService } from "./issue.service";
+import sendResponse from "../../utility/sendResponse";
 
 const createIssue = async (req: Request, res: Response) => {
   try {
@@ -7,13 +8,15 @@ const createIssue = async (req: Request, res: Response) => {
 
     const result = await issueService.createIssueIntoDB(req.body, reporter_id);
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue Created successfully",
       data: result.rows[0],
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
       error: error,
@@ -25,13 +28,15 @@ const getAllIssues = async (req: Request, res: Response) => {
   try {
     const result = await issueService.getAllIssueFromDB();
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue retrived successfully",
       data: result.rows,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
       error: error,
@@ -44,13 +49,34 @@ const getSingleIssue = async (req: Request, res: Response) => {
   try {
     const result = await issueService.getSingleIssueFromDB(id as string);
 
-    res.status(200).json({
+    const issue = result.rows[0];
+
+    const issueData = {
+      is: issue.id,
+      title: issue.title,
+      description: issue.description,
+      type: issue.type,
+      status: issue.status,
+
+      reporter: {
+        id: issue.reporter_id,
+        name: issue.reporter_name,
+        role: issue.reporter_role,
+      },
+
+      created_at: issue.created_at,
+      updated_at: issue.updated_at,
+    };
+
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue retrived successfully",
-      data: result.rows[0],
+      data: issueData,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
       error: error,
@@ -70,13 +96,15 @@ const deleteIssue = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: "Issue deleted successfully",
-      // data: result.rows,
+      data: result.rows,
     });
   } catch (error: any) {
-    res.status(500).json({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: error.message,
       error: error,

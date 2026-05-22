@@ -26,9 +26,41 @@ const getAllIssueFromDB = async () => {
 };
 
 const getSingleIssueFromDB = async (id: string) => {
+  // const result = await pool.query(
+  //   `
+  //   SELECT * FROM issues WHERE id=$1
+
+  //   users.id AS reporter_id,
+  //   users.name AS reporter_name,
+  //   users.role AS reporter_role,
+
+  //   FROM issues
+  //   JOIN users
+  //   ON issues.reporter_id = users.id
+
+  //   WHERE issues.id =$1
+  //   `,
+  //   [id],
+  // );
   const result = await pool.query(
     `
-    SELECT * FROM issues WHERE id=$1
+    SELECT 
+    issues.id,
+    issues.title,
+    issues.description,
+    issues.type,
+    issues.status,
+    issues.created_at,
+    issues.updated_at,
+
+    users.id AS reporter_id,
+    users.name AS reporter_name,
+    users.role AS reporter_role
+    
+    FROM issues
+    JOIN users
+    ON issues.reporter_id = users.id
+    WHERE issues.id = $1
     `,
     [id],
   );
