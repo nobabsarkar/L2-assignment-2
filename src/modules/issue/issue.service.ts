@@ -16,6 +16,39 @@ const createIssueIntoDB = async (payload: IIssue, reporter_id: number) => {
   return result;
 };
 
+const getAllIssueFromDB = async () => {
+  const result = await pool.query(`
+    
+    SELECT * FROM issues
+    `);
+
+  return result;
+};
+
+const getSingleIssueFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+    SELECT * FROM issues WHERE id=$1
+    `,
+    [id],
+  );
+
+  return result;
+};
+
+const deleteIssueFromDB = async (id: string) => {
+  const result = await pool.query(
+    `
+  DELETE FROM issues WHERE id=$1
+  `,
+    [id],
+  );
+  return result;
+};
+
 export const issueService = {
   createIssueIntoDB,
+  getAllIssueFromDB,
+  getSingleIssueFromDB,
+  deleteIssueFromDB,
 };

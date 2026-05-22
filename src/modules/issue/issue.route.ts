@@ -10,4 +10,10 @@ router.post(
   issueController.createIssue,
 );
 
+router.get("/issues", issueController.getAllIssues);
+
+router.get("/issues/:id", issueController.getSingleIssue);
+
+router.delete("/issues/:id", issueController.deleteIssue);
+
 export const issueRoute = router;
