@@ -29,11 +29,28 @@ const getAllIssues = async (req: Request, res: Response) => {
   try {
     const result = await issueService.getAllIssueFromDB();
 
+    const issueData = result.rows.map((issue) => ({
+      id: issue.id,
+      title: issue.title,
+      description: issue.description,
+      type: issue.type,
+      status: issue.status,
+
+      reporter: {
+        id: issue.reporter_id,
+        name: issue.reporter_name,
+        role: issue.reporter_role,
+      },
+
+      created_at: issue.created_at,
+      updated_at: issue.updated_at,
+    }));
+
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Issue retrived successfully",
-      data: result.rows,
+      data: issueData,
     });
   } catch (error: any) {
     sendResponse(res, {
@@ -53,7 +70,7 @@ const getSingleIssue = async (req: Request, res: Response) => {
     const issue = result.rows[0];
 
     const issueData = {
-      is: issue.id,
+      i: issue.id,
       title: issue.title,
       description: issue.description,
       type: issue.type,
@@ -89,20 +106,17 @@ const updateIssue = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
-    const result = await issueService.updateIssueFromDB(req.body, id as string);
-
-    if (result.rows.length === 0) {
-      res.status(404).json({
-        success: false,
-        message: "Users not found!",
-      });
-    }
+    const result = await issueService.updateIssueFromDB(
+      req.body,
+      id as string,
+      req.user,
+    );
 
     sendResponse(res, {
       statusCode: StatusCodes.OK,
       success: true,
       message: "Issue updated successfully",
-      data: result.rows[0],
+      data: result?.rows[0],
     });
   } catch (error: any) {
     sendResponse(res, {
