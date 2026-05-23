@@ -26,22 +26,6 @@ const getAllIssueFromDB = async () => {
 };
 
 const getSingleIssueFromDB = async (id: string) => {
-  // const result = await pool.query(
-  //   `
-  //   SELECT * FROM issues WHERE id=$1
-
-  //   users.id AS reporter_id,
-  //   users.name AS reporter_name,
-  //   users.role AS reporter_role,
-
-  //   FROM issues
-  //   JOIN users
-  //   ON issues.reporter_id = users.id
-
-  //   WHERE issues.id =$1
-  //   `,
-  //   [id],
-  // );
   const result = await pool.query(
     `
     SELECT 
@@ -68,6 +52,27 @@ const getSingleIssueFromDB = async (id: string) => {
   return result;
 };
 
+const updateIssueFromDB = async (payload: IIssue, id: string) => {
+  const { title, description, type } = payload;
+
+  const result = await pool.query(
+    `
+    UPDATE 
+    issues
+    SET 
+    title=COALESCE($1, title),
+    description=COALESCE($2, description),
+    type=COALESCE($3, type)
+
+    WHERE id=$4 
+    RETURNING *
+    `,
+    [title, description, type, id],
+  );
+
+  return result;
+};
+
 const deleteIssueFromDB = async (id: string) => {
   const result = await pool.query(
     `
@@ -83,4 +88,5 @@ export const issueService = {
   getAllIssueFromDB,
   getSingleIssueFromDB,
   deleteIssueFromDB,
+  updateIssueFromDB,
 };
