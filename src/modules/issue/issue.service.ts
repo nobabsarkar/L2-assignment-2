@@ -79,7 +79,6 @@ const updateIssueFromDB = async (payload: IIssue, id: string, user: any) => {
     throw new Error("Issue not found!");
   }
 
-  // if (user?.role !== "maintainer") {
   const result = await pool.query(
     `
     UPDATE
@@ -97,7 +96,6 @@ const updateIssueFromDB = async (payload: IIssue, id: string, user: any) => {
   );
 
   return result;
-  // }
 
   // if (
   //   user?.role !== "contributor" &&
