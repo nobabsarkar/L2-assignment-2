@@ -75,12 +75,15 @@ const updateIssueFromDB = async (payload: IIssue, id: string, user: any) => {
   );
 
   const issue = issueResult.rows[0];
-  if (!issue) {
-    throw new Error("Issue not found!");
-  }
 
-  const result = await pool.query(
-    `
+  if (user.role === "maintainer") {
+    const issue = issueResult.rows[0];
+    if (!issue) {
+      throw new Error("Issue not found!");
+    }
+
+    const result = await pool.query(
+      `
     UPDATE
     issues
     SET
@@ -92,32 +95,33 @@ const updateIssueFromDB = async (payload: IIssue, id: string, user: any) => {
     WHERE id=$5
     RETURNING *
     `,
-    [title, description, type, status, id],
-  );
+      [title, description, type, status, id],
+    );
 
-  return result;
+    return result;
+  }
 
-  // if (
-  //   user?.role !== "contributor" &&
-  //   issue.reporter_id !== user.id &&
-  //   issue.status !== "open"
-  // ) {
-  //   const result = await pool.query(
-  //     `
-  //     UPDATE issues
-  //     SET
-  //     title=COALESCE($1, title),
-  //     description=COALESCE($2, description),
-  //     type=COALESCE($3, type),
-  //     status=COALESCE($4, status)
+  if (
+    user?.role !== "contributor" &&
+    issue.reporter_id === user.id &&
+    issue.status === "open"
+  ) {
+    const result = await pool.query(
+      `
+      UPDATE issues
+      SET
+      title=COALESCE($1, title),
+      description=COALESCE($2, description),
+      type=COALESCE($3, type),
+      status=COALESCE($4, status)
 
-  //     WHERE id=$5
-  //     RETURNING *
-  //     `,
-  //     [title, description, type, status, id],
-  //   );
-  //   return result;
-  // }
+      WHERE id=$5
+      RETURNING *
+      `,
+      [title, description, type, status, id],
+    );
+    return result;
+  }
 };
 
 const deleteIssueFromDB = async (id: string) => {
